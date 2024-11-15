@@ -36,6 +36,8 @@ const send_message = async (content: string) => {
     if (!res.ok) {
         throw new Error(`Failed to send message: ${res.statusText}`);
     }
+
+    console.log('MESSAGE SENT: \n' + JSON.stringify(message, null, 2));
     return res;
 }
 

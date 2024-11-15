@@ -1,4 +1,4 @@
-import { fromIni, fromEnv } from '@aws-sdk/credential-providers';
+import { fromEnv } from '@aws-sdk/credential-providers';
 import { ResourceExplorer2Client, SearchCommand, type SearchCommandInput } from '@aws-sdk/client-resource-explorer-2'
 
 const client = new ResourceExplorer2Client({
