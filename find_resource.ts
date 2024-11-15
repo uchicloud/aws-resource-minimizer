@@ -1,23 +1,6 @@
 import { fromEnv } from '@aws-sdk/credential-providers';
 import { __Client, ResourceExplorer2Client, SearchCommand, type SearchCommandInput } from '@aws-sdk/client-resource-explorer-2'
 
-type Resource = {
-    Arn: string;
-    LastReportedAt: Date;
-    OwingAccountId: string;
-    Properties: Array<{
-        Data: Array<{
-            Key: string;
-            Value: string;
-        }>;
-        LastReportedAt: Date;
-        Name: string;
-    }>;
-    Region: string;
-    ResourceType: string;
-    Service: string;
-}
-
 const client = new ResourceExplorer2Client({
     credentials: fromEnv()
 });
