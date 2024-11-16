@@ -42,16 +42,20 @@ const send_message = async (content: string) => {
 }
 
 export const handler: Handler = async (event, context) => {
-    const QueryString = event.QueryString ?? '';
+    const { QueryString, isSend } = event;
 
     if (QueryString) {
-        const count = await countResources({ QueryString });
-    
-        const message = `タグのない${QueryString}が${count}件あります🤖`;
-    
-        const res = await send_message(message);
-        const json = await res.json();
-        console.log('RESPONSE: \n' + JSON.stringify(json, null, 2));
+        const { count, resources } = await countResources({ QueryString });
+
+        const message = `タグのない${QueryString}が${count}件あります🤖
+対象リソース:
+${resources.map((r) => r.Properties?.map((p) => Array.from(p.Data).filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value).join('\n'))).join('\n')}`;
+
+        if (isSend) {
+            const res = await send_message(message);
+            const json = await res.json();
+            console.log('RESPONSE: \n' + JSON.stringify(json, null, 2));
+        }
     }
     return context.logStreamName;
 }
