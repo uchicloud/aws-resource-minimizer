@@ -1,6 +1,6 @@
 import type { Handler } from "aws-lambda";
 import crypto from 'crypto';
-import { countResources } from './find_resource.ts';
+import { countResources, getThisMonth } from './find_resource.ts';
 
 const secret = process.env.DING_SECRET ?? '';
 const endpoint = process.env.DING_ENDPOINT ?? '';
@@ -42,16 +42,27 @@ const send_message = async (content: string) => {
 }
 
 export const handler: Handler = async (event, context) => {
-    const { QueryString, isSend } = event;
+    const { QueryString, skipNotify } = event;
 
     if (QueryString) {
-        const { count, resources } = await countResources({ QueryString });
+        const result = await countResources({ QueryString });
+        let message = '';
 
-        const message = `タグのない${QueryString}が${count}件あります🤖
+        if (result.emptyTag) {
+            const resources = result.emptyTag;
+            message += `タグのない${QueryString}が${resources.length}件あります🤖
 対象リソース:
-${resources.map((r) => r.Properties?.map((p) => Array.from(p.Data).filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value).join('\n'))).join('\n')}`;
-
-        if (isSend) {
+${resources.flatMap((r) => r.Properties?.map((p) => Array.from(p.Data).filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
+        }
+        if (result.remove) {
+            const resources = result.remove;
+            message.length && (message += '\n\n');
+            message += `今月までの${QueryString}が${resources.length}件あります🤖
+対象リソース:
+${resources.flatMap((r) => r.Properties?.map((p) => Array.from(p.Data).filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
+        }
+        console.log('MESSAGE: \n' + message);
+        if (!skipNotify) {
             const res = await send_message(message);
             const json = await res.json();
             console.log('RESPONSE: \n' + JSON.stringify(json, null, 2));
