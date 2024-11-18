@@ -17,8 +17,6 @@ export const countResources = async (params: SearchCommandInput): Promise<Resour
     const thisMonth = getThisMonth();
     const yyyyMM = `${thisMonth.getFullYear()}${(thisMonth.getMonth() + 1).toString().padStart(2, '0')}`;
 
-    console.log(thisMonth, yyyyMM);
-
     let res;
     const result: ResourceDict =
         { 'emptyTag': [], 'remove': [], 'over': [], 'error': [] };
@@ -52,6 +50,4 @@ export const getThisMonth = (): Date => {
     return now;
 }
 
-if (process.env.NODE_ENV === 'development') {
-    countResources({ QueryString: 'resourcetype:ec2:instance' }).then(r => console.dir(r, { depth: 6 })).catch(console.error);
-}
+// countResources({ QueryString: 'resourcetype:ec2:instance' }).then(r => console.dir(r, { depth: 6 })).catch(console.error);
