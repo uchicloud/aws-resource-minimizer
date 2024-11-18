@@ -52,6 +52,6 @@ export const getThisMonth = (): Date => {
     return now;
 }
 
-if (process.env.NODE_ENV !== 'development') {
+if (process.env.NODE_ENV === 'development') {
     countResources({ QueryString: 'resourcetype:ec2:instance' }).then(r => console.dir(r, { depth: 6 })).catch(console.error);
 }
