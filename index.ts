@@ -52,14 +52,21 @@ export const handler: Handler = async (event, context) => {
             const resources = result.emptyTag;
             message += `タグのない${QueryString}が${resources.length}件あります🤖
 対象リソース:
-${resources.flatMap((r) => r.Properties?.map((p) => Array.from(p.Data).filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
+${resources.flatMap((r) => r.Properties?.map((p) => p.Data?.filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
         }
         if (result.remove) {
             const resources = result.remove;
             message.length && (message += '\n\n');
             message += `今月までの${QueryString}が${resources.length}件あります🤖
 対象リソース:
-${resources.flatMap((r) => r.Properties?.map((p) => Array.from(p.Data).filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
+${resources.flatMap((r) => r.Properties?.map((p) => p.Data?.filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
+        }
+        if (result.over) {
+            const resources = result.over;
+            message.length && (message += '\n\n');
+            message += `期限超過の${QueryString}が${resources.length}件あります🤖
+対象リソース:
+${resources.flatMap((r) => r.Properties?.map((p) => p.Data?.filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
         }
         console.log('MESSAGE: \n' + message);
         if (!skipNotify) {

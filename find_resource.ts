@@ -16,17 +16,29 @@ export const countResources = async (params: SearchCommandInput): Promise<Resour
     const searchCommand = new SearchCommand(params);
     const thisMonth = getThisMonth();
     const yyyyMM = `${thisMonth.getFullYear()}${(thisMonth.getMonth() + 1).toString().padStart(2, '0')}`;
-     
+
     console.log(thisMonth, yyyyMM);
 
     let res;
-    const result: ResourceDict = 
-        {'emptyTag': [], 'remove': [], 'over': [], 'error': []};
+    const result: ResourceDict =
+        { 'emptyTag': [], 'remove': [], 'over': [], 'error': [] };
     do {
         res = await client.send(searchCommand);
-        res.Resources?.filter((r) => r.Properties?.some((p) => Array.from(p.Data).every((obj) => obj.Key === 'Name'))).forEach((r) => result.emptyTag.push(r));
-        res.Resources?.filter((r) => r.Properties?.some((p) => Array.from(p.Data).some((obj) => obj.Key.indexOf(yyyyMM) === 0))).forEach((r) => result.remove.push(r));
-        res.Resources?.filter((r) => r.Properties?.some((p) => Array.from(p.Data).some((obj) => obj.Key < yyyyMM && obj.Key < `${yyyyMM}01`))).forEach((r) => result.over.push(r));
+        res.Resources?.forEach((r) => {
+            let isNameOnly = true;
+            r.Properties?.forEach((p) => {
+                if (isNameOnly && p.Data.every((obj) => obj.Key !== 'Name')) {
+                    isNameOnly = false;
+                } else if (p.Data.some((obj) => obj.Key.indexOf(yyyyMM) === 0)) {
+                    result.remove.push(r);
+                } else if (p.Data.some((obj) => obj.Key < yyyyMM && obj.Key < `${yyyyMM}01`)) {
+                    result.over.push(r);
+                }
+            });
+            if (isNameOnly) {
+                result.emptyTag.push(r);
+            }
+        });
         params.NextToken = res.NextToken;
     } while (res.NextToken);
 
@@ -40,4 +52,6 @@ export const getThisMonth = (): Date => {
     return now;
 }
 
-countResources({ QueryString: 'resourcetype:ec2:instance' }).then(r => console.dir(r, {depth: 6})).catch(console.error);
+if (process.env.NODE_ENV !== 'development') {
+    countResources({ QueryString: 'resourcetype:ec2:instance' }).then(r => console.dir(r, { depth: 6 })).catch(console.error);
+}
