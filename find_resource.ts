@@ -1,6 +1,6 @@
 import { fromEnv } from '@aws-sdk/credential-providers';
 import { __Client, ResourceExplorer2Client, SearchCommand, type Resource, type SearchCommandInput } from '@aws-sdk/client-resource-explorer-2'
-import { isBeforeThisMonth, validateDateTag } from './utility';
+import { isBeforeThisMonth, isValidDate } from './utility';
 
 type ResourceDict = {
     emptyTag: Resource[], // Nameタグのみのリソース
@@ -29,7 +29,7 @@ export const categorizeResources = async (params: SearchCommandInput): Promise<R
                     result.emptyTag.push(r);
                 } else if ((p.Data as { [K: string]: string }[]).some((obj) => obj.Key.indexOf(yyyyMM) === 0)) {
                     result.remove.push(r);
-                } else if ((p.Data as { [K: string]: string }[]).some((obj) => validateDateTag(obj))) {
+                } else if ((p.Data as { [K: string]: string }[]).some((obj) => !isValidDate(obj))) {
                     result.error.push(r);
                 } else if ((p.Data as { [K: string]: string }[]).some((obj) => isBeforeThisMonth(obj, thisMonth))) {
                     result.over.push(r);
