@@ -23,11 +23,10 @@ export const categorizeResources = async (params: SearchCommandInput): Promise<R
         { 'emptyTag': [], 'remove': [], 'over': [], 'error': [] };
     do {
         res = await client.send(searchCommand);
-        res.Resources?.forEach((r) => {
-            let isNameOnly = true;
+        res.Resources?.forEach((r) => 
             r.Properties?.forEach((p) => {
-                if (isNameOnly && (p.Data as { [K: string]: string }[]).some((obj) => obj.Key !== 'Name')) {
-                    isNameOnly = false;
+                if ((p.Data as { [K: string]: string }[]).every((obj) => obj.Key === 'Name')) {
+                    result.emptyTag.push(r);
                 } else if ((p.Data as { [K: string]: string }[]).some((obj) => obj.Key.indexOf(yyyyMM) === 0)) {
                     result.remove.push(r);
                 } else if ((p.Data as { [K: string]: string }[]).some((obj) => validateDateTag(obj))) {
@@ -35,11 +34,8 @@ export const categorizeResources = async (params: SearchCommandInput): Promise<R
                 } else if ((p.Data as { [K: string]: string }[]).some((obj) => isBeforeThisMonth(obj, thisMonth))) {
                     result.over.push(r);
                 }
-            });
-            if (isNameOnly) {
-                result.emptyTag.push(r);
-            }
-        });
+            })
+        );
         params.NextToken = res.NextToken;
     } while (res.NextToken);
 
@@ -53,4 +49,4 @@ export const getThisMonth = (): Date => {
     return now;
 }
 
-// countResources({ QueryString: 'resourcetype:ec2:instance' }).then(r => console.dir(r, { depth: 6 })).catch(console.error);
+// categorizeResources({ QueryString: 'resourcetype:ec2:instance' }).then(r => console.dir(r, { depth: 6 })).catch(console.error);
