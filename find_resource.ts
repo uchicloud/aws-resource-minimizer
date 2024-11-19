@@ -1,18 +1,19 @@
 import { fromEnv } from '@aws-sdk/credential-providers';
 import { __Client, ResourceExplorer2Client, SearchCommand, type Resource, type SearchCommandInput } from '@aws-sdk/client-resource-explorer-2'
+import { isBeforeThisMonth, validateDateTag } from './utility';
 
 type ResourceDict = {
-    emptyTag: Resource[],
-    remove: Resource[],
-    over: Resource[],
-    error: Resource[],
+    emptyTag: Resource[], // Nameタグのみのリソース
+    remove:   Resource[], // yyyyMM形式のタグが含まれているリソース
+    over:     Resource[], // yyyyMM形式のタグが含まれており、かつそのタグが現在の月よりも前のリソース
+    error:    Resource[], // 存在しない日付タグがついたリソース
 }
 
 const client = new ResourceExplorer2Client({
     credentials: fromEnv()
 });
 
-export const countResources = async (params: SearchCommandInput): Promise<ResourceDict> => {
+export const categorizeResources = async (params: SearchCommandInput): Promise<ResourceDict> => {
     const searchCommand = new SearchCommand(params);
     const thisMonth = getThisMonth();
     const yyyyMM = `${thisMonth.getFullYear()}${(thisMonth.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -25,11 +26,13 @@ export const countResources = async (params: SearchCommandInput): Promise<Resour
         res.Resources?.forEach((r) => {
             let isNameOnly = true;
             r.Properties?.forEach((p) => {
-                if (isNameOnly && p.Data.every((obj) => obj.Key !== 'Name')) {
+                if (isNameOnly && (p.Data as { [K: string]: string }[]).some((obj) => obj.Key !== 'Name')) {
                     isNameOnly = false;
-                } else if (p.Data.some((obj) => obj.Key.indexOf(yyyyMM) === 0)) {
+                } else if ((p.Data as { [K: string]: string }[]).some((obj) => obj.Key.indexOf(yyyyMM) === 0)) {
                     result.remove.push(r);
-                } else if (p.Data.some((obj) => obj.Key < yyyyMM && obj.Key < `${yyyyMM}01`)) {
+                } else if ((p.Data as { [K: string]: string }[]).some((obj) => validateDateTag(obj))) {
+                    result.error.push(r);
+                } else if ((p.Data as { [K: string]: string }[]).some((obj) => isBeforeThisMonth(obj, thisMonth))) {
                     result.over.push(r);
                 }
             });

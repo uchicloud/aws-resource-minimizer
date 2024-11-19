@@ -1,6 +1,6 @@
 import type { Handler } from "aws-lambda";
 import crypto from 'crypto';
-import { countResources, getThisMonth } from './find_resource.ts';
+import { categorizeResources, getThisMonth } from './find_resource.ts';
 
 const secret = process.env.DING_SECRET ?? '';
 const endpoint = process.env.DING_ENDPOINT ?? '';
@@ -45,30 +45,40 @@ export const handler: Handler = async (event, context) => {
     const { QueryString, skipNotify } = event;
 
     if (QueryString) {
-        const result = await countResources({ QueryString });
+        const result = await categorizeResources({ QueryString });
         let message = '';
 
         if (result.emptyTag.length) {
             const resources = result.emptyTag;
             message += `タグのない${QueryString}が${resources.length}件あります🤖
 対象リソース:
-${resources.flatMap((r) => r.Properties?.map((p) => p.Data?.filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
+${resources.flatMap((r) => r.Properties?.map((p) =>
+                (p.Data as { [K: string]: string }[])?.filter((d) =>
+                    d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
         }
+
         if (result.remove.length) {
             const resources = result.remove;
             message.length && (message += '\n\n');
             message += `今月までの${QueryString}が${resources.length}件あります🤖
 対象リソース:
-${resources.flatMap((r) => r.Properties?.map((p) => p.Data?.filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
+${resources.flatMap((r) => r.Properties?.map((p) =>
+                (p.Data as { [K: string]: string }[])?.filter((d) =>
+                    d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
         }
+
         if (result.over.length) {
             const resources = result.over;
             message.length && (message += '\n\n');
             message += `期限超過の${QueryString}が${resources.length}件あります🤖
 対象リソース:
-${resources.flatMap((r) => r.Properties?.map((p) => p.Data?.filter((d) => d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
+${resources.flatMap((r) => r.Properties?.map((p) =>
+                (p.Data as { [K: string]: string }[])?.filter((d) =>
+                    d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
         }
+
         console.log('MESSAGE: \n' + message);
+
         if (!skipNotify) {
             const res = await send_message(message);
             const json = await res.json();
