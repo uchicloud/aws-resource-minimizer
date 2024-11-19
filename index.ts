@@ -5,6 +5,11 @@ import { categorizeResources, getThisMonth } from './find_resource.ts';
 const secret = process.env.DING_SECRET ?? '';
 const endpoint = process.env.DING_ENDPOINT ?? '';
 
+const messageDict: {[K: string]: string;} = {
+    'resourcetype:ec2:instance': 'EC2インスタンス',
+    'resourcetype:rds:db-instance': 'RDSインスタンス',
+};
+
 const calcHmac = (time: number) => {
     const sign = `${time}\n${secret}`;
     const hmac = crypto.createHmac('sha256', secret);
@@ -50,7 +55,7 @@ export const handler: Handler = async (event, context) => {
 
         if (result.emptyTag.length) {
             const resources = result.emptyTag;
-            message += `タグのない${QueryString}が${resources.length}件あります🤖
+            message += `タグのない${messageDict[QueryString]}が${resources.length}件あります🤖
 対象リソース:
 ${resources.flatMap((r) => r.Properties?.map((p) =>
                 (p.Data as { [K: string]: string }[])?.filter((d) =>
@@ -60,7 +65,7 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
         if (result.remove.length) {
             const resources = result.remove;
             message.length && (message += '\n\n');
-            message += `今月までの${QueryString}が${resources.length}件あります🤖
+            message += `今月までの${messageDict[QueryString]}が${resources.length}件あります🤖
 対象リソース:
 ${resources.flatMap((r) => r.Properties?.map((p) =>
                 (p.Data as { [K: string]: string }[])?.filter((d) =>
@@ -70,7 +75,7 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
         if (result.over.length) {
             const resources = result.over;
             message.length && (message += '\n\n');
-            message += `期限超過の${QueryString}が${resources.length}件あります🤖
+            message += `期限超過の${messageDict[QueryString]}が${resources.length}件あります🤖
 対象リソース:
 ${resources.flatMap((r) => r.Properties?.map((p) =>
                 (p.Data as { [K: string]: string }[])?.filter((d) =>
@@ -80,14 +85,14 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
         if (result.error.length) {
             const resources = result.error;
             message.length && (message += '\n\n');
-            message += `不正な日付タグの${QueryString}が${resources.length}件あります🤖
+            message += `不正な日付タグの${messageDict[QueryString]}が${resources.length}件あります🤖
 対象リソース:
 ${resources.flatMap((r) => r.Properties?.map((p) =>
                 (p.Data as { [K: string]: string }[])?.filter((d) =>
                     d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
 
         }
-        
+
         console.log('MESSAGE: \n' + message);
 
         if (!skipNotify) {
