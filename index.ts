@@ -86,6 +86,8 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
                 (p.Data as { [K: string]: string }[])?.filter((d) =>
                     d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
 
+        }
+        
         console.log('MESSAGE: \n' + message);
 
         if (!skipNotify) {
