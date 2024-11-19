@@ -1,15 +1,7 @@
-# resource-explorer
+# aws-resource-minimizer
 
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.1.29. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## 開発の手順
+1. **bun**をインストールする
+1. 環境変数を設定し、AWSアカウント情報を紐づける  
+1. `bun run build`でLambdaを構築
+1. `bun run update`でLambdaを更新
