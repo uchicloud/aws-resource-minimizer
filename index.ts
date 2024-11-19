@@ -77,6 +77,15 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
                     d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
         }
 
+        if (result.error.length) {
+            const resources = result.error;
+            message.length && (message += '\n\n');
+            message += `不正な日付タグの${QueryString}が${resources.length}件あります🤖
+対象リソース:
+${resources.flatMap((r) => r.Properties?.map((p) =>
+                (p.Data as { [K: string]: string }[])?.filter((d) =>
+                    d.Key === 'Name').map((d) => '- ' + d.Value))).join('\n')}`;
+
         console.log('MESSAGE: \n' + message);
 
         if (!skipNotify) {
