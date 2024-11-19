@@ -1,0 +1,26 @@
+{
+  "name": "resource-explorer",
+  "module": "index",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-resource-explorer-2": "^3.691.0",
+    "@aws-sdk/client-s3": "^3.693.0",
+    "@aws-sdk/credential-providers": "^3.691.0",
+    "@types/aws-lambda": "^8.10.145",
+    "cross-var": "^1.1.0",
+    "dotenv-cli": "^7.4.3"
+  },
+  "scripts": {
+    "prebuild": "rm -rf out",
+    "build": "bun build --entrypoint index.ts --target 'node' --outfile out/index.mjs",
+    "postbuild": "cd out && 7z a -tzip index.zip *.mjs && bun run deploy; rm -f *.zip",
+    "deploy": "dotenv cross-var 'aws lambda create-function --function-name resource-explorer --runtime \"nodejs20.x\" --role $AWS_ROLE_ARN --zip-file \"fileb://index.zip\" --environment \"Variables={$VARS}\" --handler index.handler'",
+    "update": "rm -rf out && bun build --entrypoint index.ts --target 'node' --outfile out/index.mjs && cd out && 7z a -tzip index.zip *.mjs && aws lambda update-function-code --function-name resource-explorer --zip-file \"fileb://index.zip\"; rm -f *.zip"
+  }
+}
