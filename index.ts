@@ -104,10 +104,12 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
             console.log('RESPONSE: \n' + JSON.stringify(json, null, 2));
         }
 
-        [...Array(5)].some(async (_) =>
-            saveS3(result, getThisMonth(), messageDict[QueryString+'_en'])
-                .then((r) => r ? true : false)
-        );
+        for (const _ of Array(5)) {
+            const res = await saveS3(result, getThisMonth(), messageDict[QueryString+'_en']);
+            if (res) {
+                break;
+            }
+        }
 
     }
     return context.logStreamName;
