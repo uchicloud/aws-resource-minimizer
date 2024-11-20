@@ -104,14 +104,10 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
             console.log('RESPONSE: \n' + JSON.stringify(json, null, 2));
         }
 
-        let saved;
         [...Array(5)].some(async (_) =>
             saveS3(result, getThisMonth(), messageDict[QueryString+'_en'])
-                .then((r) => (saved = r) ? true : false)
+                .then((r) => r ? true : false)
         );
-        if (!saved) {
-            console.error('ALERT: S3への保存に失敗しました');
-        }
 
     }
     return context.logStreamName;
