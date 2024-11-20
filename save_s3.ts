@@ -12,11 +12,15 @@ export const saveS3 = async (data: ResourceDict, thisMonth: Date, type: string):
     const today = new Date();
     today.setHours(today.getUTCHours() + 9);
 
+    const expire_date = new Date(thisMonth);
+    expire_date.setMonth(expire_date.getMonth() + 6);
+    
     const params = {
         Bucket: bucket,
         Key: path.posix.join('delete-candidates', thisMonth.toISOString().slice(0, 10), type, 'resources.json'),
         Body: JSON.stringify(data, null, 3),
         ContentType: 'application/json',
+        Expires: expire_date,
     };
     const command = new PutObjectCommand(params);
 
