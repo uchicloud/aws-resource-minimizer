@@ -10,11 +10,14 @@ const client = new S3Client({
 
 export const saveS3 = async (data: ResourceDict, thisMonth: Date, type: string): Promise<PutObjectCommandOutput | null> => {
     const today = new Date();
+    // UTC -> JST
     today.setHours(today.getUTCHours() + 9);
 
-    const expire_date = new Date(thisMonth);
+    // JST -> UTC
+    const expire_date = new Date(today);
+    expire_date.setHours(expire_date.getHours() - 9);
     expire_date.setMonth(expire_date.getMonth() + 6);
-    
+
     const params = {
         Bucket: bucket,
         Key: path.posix.join('delete-candidates', thisMonth.toISOString().slice(0, 10), type, 'resources.json'),
