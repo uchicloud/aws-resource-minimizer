@@ -19,8 +19,8 @@
   "scripts": {
     "prebuild": "rm -rf out",
     "build": "bun build --entrypoint index.ts --target 'node' --outfile out/index.mjs",
-    "postbuild": "cd out && 7z a -tzip index.zip *.mjs && bun run deploy; rm -f *.zip",
-    "deploy": "dotenv cross-var 'aws lambda create-function --function-name resource-explorer --runtime \"nodejs20.x\" --role $AWS_ROLE_ARN --zip-file \"fileb://index.zip\" --environment \"Variables={$VARS}\" --handler index.handler'",
+    "postbuild": "cd out && 7z a -tzip index.zip *.mjs && mv *.zip .. && cd .. && bun run deploy; rm -f *.zip",
+    "deploy": "aws lambda create-function --function-name resource-explorer --runtime \"nodejs20.x\" --role $AWS_ROLE_ARN --zip-file \"fileb://index.zip\" --environment \"Variables={$VARS}\" --handler index.handler",
     "update": "rm -rf out && bun build --entrypoint index.ts --target 'node' --outfile out/index.mjs && cd out && 7z a -tzip index.zip *.mjs && aws lambda update-function-code --function-name resource-explorer --zip-file \"fileb://index.zip\"; rm -f *.zip"
   }
 }
