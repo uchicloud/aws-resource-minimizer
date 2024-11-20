@@ -2,7 +2,7 @@ import { fromEnv } from '@aws-sdk/credential-providers';
 import { __Client, ResourceExplorer2Client, SearchCommand, type Resource, type SearchCommandInput } from '@aws-sdk/client-resource-explorer-2'
 import { isBeforeThisMonth, isValidDate } from './utility';
 
-type ResourceDict = {
+export type ResourceDict = {
     emptyTag: Resource[], // Nameタグのみのリソース
     remove:   Resource[], // yyyyMM形式のタグが含まれているリソース
     over:     Resource[], // yyyyMM形式のタグが含まれており、かつそのタグが現在の月よりも前のリソース

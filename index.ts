@@ -1,6 +1,7 @@
 import type { Handler } from "aws-lambda";
 import crypto from 'crypto';
 import { categorizeResources, getThisMonth } from './find_resource.ts';
+import { saveS3 } from "./save_s3.ts";
 
 const secret = process.env.DING_SECRET ?? '';
 const endpoint = process.env.DING_ENDPOINT ?? '';
@@ -100,6 +101,16 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
             const json = await res.json();
             console.log('RESPONSE: \n' + JSON.stringify(json, null, 2));
         }
+
+        let saved;
+        [...Array(5)].some(async (_) =>
+            saveS3(result, getThisMonth(), messageDict[QueryString])
+                .then((r) => (saved = r) ? true : false)
+        );
+        if (!saved) {
+            console.error('ALEART: S3への保存に失敗しました');
+        }
+
     }
     return context.logStreamName;
 }
