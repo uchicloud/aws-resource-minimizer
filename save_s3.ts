@@ -14,10 +14,9 @@ export const saveS3 = async (data: ResourceDict, thisMonth: Date, type: string):
 
     const params = {
         Bucket: bucket,
-        Key: path.posix.join(thisMonth.toISOString().slice(0, 10), 'resources.json'),
+        Key: path.posix.join(thisMonth.toISOString().slice(0, 10), type, 'resources.json'),
         Body: JSON.stringify(data, null, 3),
         ContentType: 'application/json',
-        Metadata: { "resourcetype": type },
     };
     const command = new PutObjectCommand(params);
 
