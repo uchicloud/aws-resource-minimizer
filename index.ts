@@ -8,7 +8,9 @@ const endpoint = process.env.DING_ENDPOINT ?? '';
 
 const messageDict: {[K: string]: string;} = {
     'resourcetype:ec2:instance': 'EC2インスタンス',
+    'resourcetype:ec2:instance_en': 'EC2 Instance',
     'resourcetype:rds:db-instance': 'RDSインスタンス',
+    'resourcetype:rds:db-instance_en': 'RDS Instance',
 };
 
 const calcHmac = (time: number) => {
@@ -104,11 +106,11 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
 
         let saved;
         [...Array(5)].some(async (_) =>
-            saveS3(result, getThisMonth(), messageDict[QueryString])
+            saveS3(result, getThisMonth(), messageDict[QueryString+'_en'])
                 .then((r) => (saved = r) ? true : false)
         );
         if (!saved) {
-            console.error('ALEART: S3への保存に失敗しました');
+            console.error('ALERT: S3への保存に失敗しました');
         }
 
     }
