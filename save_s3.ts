@@ -14,7 +14,7 @@ export const saveS3 = async (data: ResourceDict, thisMonth: Date, type: string):
 
     const params = {
         Bucket: bucket,
-        Key: path.posix.join(thisMonth.toISOString().slice(0, 10), type, 'resources.json'),
+        Key: path.posix.join('delete-candidates', thisMonth.toISOString().slice(0, 10), type, 'resources.json'),
         Body: JSON.stringify(data, null, 3),
         ContentType: 'application/json',
     };
