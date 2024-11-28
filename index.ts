@@ -1,47 +1,8 @@
 import type { Handler } from "aws-lambda";
-import crypto from 'crypto';
 import { categorizeResources, getThisMonth } from './find_resource';
 import { saveS3 } from "./save_s3";
 import { messageDict } from './constants'
-
-const secret = process.env.DING_SECRET ?? '';
-const endpoint = process.env.DING_ENDPOINT ?? '';
-
-const calcHmac = (time: number) => {
-    const sign = `${time}\n${secret}`;
-    const hmac = crypto.createHmac('sha256', secret);
-    hmac.update(sign);
-    const digest = hmac.digest('base64');
-    return encodeURIComponent(digest);
-}
-
-const send_message = async (content: string) => {
-    const now = Date.now();
-    const hmac = calcHmac(now);
-    const url = `${endpoint}&timestamp=${now}&sign=${hmac}`;
-    const message = {
-        "msgtype": "text",
-        "text": {
-            content
-        }
-    };
-
-    const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'charset': 'utf-8',
-        },
-        body: JSON.stringify(message)
-    });
-
-    if (!res.ok) {
-        throw new Error(`Failed to send message: ${res.statusText}`);
-    }
-
-    console.log('MESSAGE SENT: \n' + JSON.stringify(message, null, 2));
-    return res;
-}
+import { send_message } from './utility';
 
 export const handler: Handler = async (event, context) => {
     const { QueryString, skipNotify } = event;
