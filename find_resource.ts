@@ -1,6 +1,7 @@
 import { fromEnv } from '@aws-sdk/credential-providers';
 import { __Client, ResourceExplorer2Client, SearchCommand, type Resource, type SearchCommandInput } from '@aws-sdk/client-resource-explorer-2'
 import { isBeforeThisMonth, isValidDate } from './utility';
+import { ignoreTags } from './constants';
 
 export type ResourceDict = {
     emptyTag: Resource[], // Nameタグのみのリソース
@@ -25,7 +26,7 @@ export const categorizeResources = async (params: SearchCommandInput): Promise<R
         res = await client.send(searchCommand);
         res.Resources?.forEach((r) => 
             r.Properties?.forEach((p) => {
-                if ((p.Data as { [K: string]: string }[]).every((obj) => obj.Key === 'Name')) {
+                if ((p.Data as { [K: string]: string }[]).every((obj) => ignoreTags.includes(obj.Key))) {
                     result.emptyTag.push(r);
                 } else if ((p.Data as { [K: string]: string }[]).some((obj) => obj.Key.indexOf(yyyyMM) === 0)) {
                     result.remove.push(r);

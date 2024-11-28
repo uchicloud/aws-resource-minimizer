@@ -1,17 +1,11 @@
 import type { Handler } from "aws-lambda";
 import crypto from 'crypto';
-import { categorizeResources, getThisMonth } from './find_resource.ts';
-import { saveS3 } from "./save_s3.ts";
+import { categorizeResources, getThisMonth } from './find_resource';
+import { saveS3 } from "./save_s3";
+import { messageDict } from './constants'
 
 const secret = process.env.DING_SECRET ?? '';
 const endpoint = process.env.DING_ENDPOINT ?? '';
-
-const messageDict: {[K: string]: string;} = {
-    'resourcetype:ec2:instance': 'EC2インスタンス',
-    'resourcetype:ec2:instance_en': 'EC2 Instance',
-    'resourcetype:rds:db-instance': 'RDSインスタンス',
-    'resourcetype:rds:db-instance_en': 'RDS Instance',
-};
 
 const calcHmac = (time: number) => {
     const sign = `${time}\n${secret}`;
