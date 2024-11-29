@@ -1,7 +1,7 @@
 import { fromEnv } from '@aws-sdk/credential-providers';
 import { __Client, ResourceExplorer2Client, SearchCommand, type SearchCommandInput } from '@aws-sdk/client-resource-explorer-2'
-import { isBeforeThisMonth, isValidDate } from './utility';
-import { ignoreTags, type ResourceDict } from './constants';
+import { getThisMonth, isBeforeThisMonth, isValidDate } from './utility';
+import { ignoreTags, type ResourceDict} from './constants';
 
 const client = new ResourceExplorer2Client({
     credentials: fromEnv()
@@ -35,4 +35,4 @@ export const categorizeResources = async (params: SearchCommandInput, thisMonth:
     return result;
 }
 
-// categorizeResources({ QueryString: 'resourcetype:ec2:instance' }).then(r => console.dir(r, { depth: 6 })).catch(console.error);
+// categorizeResources({ QueryString: 'resourcetype:rds:db' }, getThisMonth()).then(r => console.dir(r, { depth: 6 })).catch(console.error);

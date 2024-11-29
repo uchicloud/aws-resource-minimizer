@@ -1,7 +1,7 @@
 import { S3Client, PutObjectCommand, type PutObjectCommandOutput } from '@aws-sdk/client-s3';
 import { fromEnv } from '@aws-sdk/credential-providers';
 import path from 'path';
-import type { ResourceDict } from './find_resource';
+import type { ResourceDict } from './constants';
 
 const bucket = process.env.S3_BUCKET ?? '';
 const client = new S3Client({
