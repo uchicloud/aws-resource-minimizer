@@ -52,6 +52,9 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
 
         }
 
+        if (!message.length) {
+            message = `削除する${messageDict[QueryString]}はありません🎉`;
+        }
         console.log('MESSAGE: \n' + message);
 
         if (!skipNotify) {
