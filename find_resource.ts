@@ -1,22 +1,14 @@
 import { fromEnv } from '@aws-sdk/credential-providers';
-import { __Client, ResourceExplorer2Client, SearchCommand, type Resource, type SearchCommandInput } from '@aws-sdk/client-resource-explorer-2'
+import { __Client, ResourceExplorer2Client, SearchCommand, type SearchCommandInput } from '@aws-sdk/client-resource-explorer-2'
 import { isBeforeThisMonth, isValidDate } from './utility';
-import { ignoreTags } from './constants';
-
-export type ResourceDict = {
-    emptyTag: Resource[], // Nameタグのみのリソース
-    remove:   Resource[], // yyyyMM形式のタグが含まれているリソース
-    over:     Resource[], // yyyyMM形式のタグが含まれており、かつそのタグが現在の月よりも前のリソース
-    error:    Resource[], // 存在しない日付タグがついたリソース
-}
+import { ignoreTags, type ResourceDict } from './constants';
 
 const client = new ResourceExplorer2Client({
     credentials: fromEnv()
 });
 
-export const categorizeResources = async (params: SearchCommandInput): Promise<ResourceDict> => {
+export const categorizeResources = async (params: SearchCommandInput, thisMonth: Date): Promise<ResourceDict> => {
     const searchCommand = new SearchCommand(params);
-    const thisMonth = getThisMonth();
     const yyyyMM = `${thisMonth.getFullYear()}${(thisMonth.getMonth() + 1).toString().padStart(2, '0')}`;
 
     let res;
@@ -41,16 +33,6 @@ export const categorizeResources = async (params: SearchCommandInput): Promise<R
     } while (res.NextToken);
 
     return result;
-}
-
-export const getThisMonth = (): Date => {
-    const now = new Date();
-    // UTC -> JST
-    now.setHours(now.getUTCHours() + 9, 59, 59, 999);
-    // 今月末の日付に変更
-    now.setMonth(now.getMonth() + 1);
-    now.setDate(0);
-    return now;
 }
 
 // categorizeResources({ QueryString: 'resourcetype:ec2:instance' }).then(r => console.dir(r, { depth: 6 })).catch(console.error);

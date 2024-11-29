@@ -1,14 +1,15 @@
 import type { Handler } from "aws-lambda";
-import { categorizeResources, getThisMonth } from './find_resource';
+import { categorizeResources } from './find_resource';
 import { saveS3 } from "./save_s3";
 import { messageDict } from './constants'
-import { send_message } from './utility';
+import { getThisMonth, send_message } from './utility';
 
 export const handler: Handler = async (event, context) => {
     const { QueryString, skipNotify } = event;
+    const thisMonth = getThisMonth();
 
     if (QueryString) {
-        const result = await categorizeResources({ QueryString });
+        const result = await categorizeResources({ QueryString }, thisMonth);
         let message = '';
 
         if (result.emptyTag.length) {
@@ -60,7 +61,7 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
         }
 
         for (const _ of Array(5)) {
-            const res = await saveS3(result, getThisMonth(), messageDict[QueryString+'_en']);
+            const res = await saveS3(result, thisMonth, messageDict[QueryString+'_en']);
             if (res) {
                 break;
             }
