@@ -20,7 +20,7 @@ export const categorizeResources = async (params: SearchCommandInput, thisMonth:
             r.Properties?.forEach((p) => {
                 const d = (p.Data as { [K: string]: string }[]) ?? [];
                 if (d.map(obj => obj.Key).every(key => key !== 'Name')) {
-                    const Value = r.Arn?.split(':').slice(-1)[0] ?? 'Unknown';
+                    const Value = r.Arn?.split(':').pop() ?? 'Unknown';
                     d.push({ Key: 'Name', Value });
                 }
                 if (d.every((obj) => ignoreTags.includes(obj.Key))) {
