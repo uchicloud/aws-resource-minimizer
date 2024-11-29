@@ -8,7 +8,9 @@ export const handler: Handler = async (event, context) => {
     const { QueryString, skipNotify } = event;
     const thisMonth = getThisMonth();
 
-    if (QueryString) {
+    const queries: [string] = QueryString && [QueryString] || Object.keys(messageDict).filter(q => !q.match(/.*_en$/));
+
+    await Promise.all(queries.map( async (QueryString) => {
         const result = await categorizeResources({ QueryString }, thisMonth);
         let message = '';
 
@@ -70,6 +72,6 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
             }
         }
 
-    }
+    }));
     return context.logStreamName;
 }
