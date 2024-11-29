@@ -8,7 +8,7 @@ export const handler: Handler = async (event, context) => {
     const { QueryString, skipNotify } = event;
     const thisMonth = getThisMonth();
 
-    const queries: [string] = QueryString && [QueryString] || Object.keys(messageDict).filter(q => !q.match(/.*_en$/));
+    const queries: [string] = QueryString && [QueryString] || Object.keys(messageDict).filter(q => !q.endsWith('_en'));
 
     await Promise.all(queries.map( async (QueryString) => {
         const result = await categorizeResources({ QueryString }, thisMonth);
