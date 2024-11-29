@@ -40,4 +40,6 @@ export const categorizeResources = async (params: SearchCommandInput, thisMonth:
     return result;
 }
 
-// categorizeResources({ QueryString: 'resourcetype:rds:db' }, getThisMonth()).then(r => console.dir(r, { depth: 6 })).catch(console.error);
+if (process.env.NODE_ENV === 'development') {
+    categorizeResources({ QueryString: 'resourcetype:rds:db' }, getThisMonth()).then(r => console.dir(r, { depth: 6 })).catch(console.error);
+}
