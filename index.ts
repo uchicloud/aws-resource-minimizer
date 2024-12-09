@@ -61,11 +61,10 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
 
         if (!skipNotify) {
             try {
-                const res = await send_message(message);
-                const json = await res.json();
-                console.log('RESPONSE: \n' + JSON.stringify(json, null, 2));
+                const json = await send_message(message);
+                console.log('RESPONSE: \n' + JSON.stringify(json));
             } catch (e) {
-                console.error('FAILED TO SEND MESSAGE: \n' + e);
+                console.error(e);
             }
         }
 
