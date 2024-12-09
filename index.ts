@@ -54,12 +54,9 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
 
         }
 
-        if (!message.length) {
-            message = `削除する${messageDict[QueryString]}はありません🎉`;
-        }
         console.log('MESSAGE: \n' + message);
 
-        if (!skipNotify) {
+        if (!message.length && !skipNotify) {
             try {
                 const json = await send_message(message);
                 console.log('RESPONSE: \n' + JSON.stringify(json));
