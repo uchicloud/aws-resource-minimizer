@@ -114,7 +114,6 @@ export const send_message = async (content: string) => {
         }
     
         const now = Date.now();
-        const hmac = calcHmac(now);
         url += `&timestamp=${now}&sign=${calcHmac(now)}`;
     }
     const message = {
