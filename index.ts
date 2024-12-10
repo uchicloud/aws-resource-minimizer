@@ -54,14 +54,18 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
 
         }
 
-        console.log('MESSAGE: \n' + message);
+        console.log('MESSAGE: \n' + message ? message : 'No message to send');
 
-        if (!message.length && !skipNotify) {
+        if (message && !skipNotify) {
             try {
                 const json = await send_message(message);
                 console.log('RESPONSE: \n' + JSON.stringify(json));
             } catch (e) {
-                console.error(e);
+                if (e instanceof Error) {
+                    console.error(e.message);
+                } else {
+                    console.error(e);
+                }
             }
         }
 
