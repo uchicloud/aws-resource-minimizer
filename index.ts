@@ -25,7 +25,7 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
 
         if (result.remove.length) {
             const resources = result.remove;
-            message.length && (message += '\n\n');
+            message && (message += '\n\n');
             message += `今月までの${messageDict[QueryString]}が${resources.length}件あります🤖
 対象リソース:
 ${resources.flatMap((r) => r.Properties?.map((p) =>
@@ -35,7 +35,7 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
 
         if (result.over.length) {
             const resources = result.over;
-            message.length && (message += '\n\n');
+            message && (message += '\n\n');
             message += `期限超過の${messageDict[QueryString]}が${resources.length}件あります🤖
 対象リソース:
 ${resources.flatMap((r) => r.Properties?.map((p) =>
@@ -45,7 +45,7 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
 
         if (result.error.length) {
             const resources = result.error;
-            message.length && (message += '\n\n');
+            message && (message += '\n\n');
             message += `不正な日付タグの${messageDict[QueryString]}が${resources.length}件あります🤖
 対象リソース:
 ${resources.flatMap((r) => r.Properties?.map((p) =>

@@ -1,5 +1,5 @@
 import { fromEnv } from '@aws-sdk/credential-providers';
-import { __Client, ResourceExplorer2Client, SearchCommand, type SearchCommandInput } from '@aws-sdk/client-resource-explorer-2'
+import { __Client, ResourceExplorer2Client, SearchCommand, type SearchCommandInput, type SearchCommandOutput } from '@aws-sdk/client-resource-explorer-2'
 import { getThisMonth, isBeforeThisMonth, isValidDate } from './utility';
 import { ignoreTags, type ResourceDict} from './constants';
 
@@ -11,7 +11,7 @@ export const categorizeResources = async (params: SearchCommandInput, thisMonth:
     const searchCommand = new SearchCommand(params);
     const yyyyMM = `${thisMonth.getFullYear()}${(thisMonth.getMonth() + 1).toString().padStart(2, '0')}`;
 
-    let res;
+    let res: SearchCommandOutput;
     const result: ResourceDict =
         { 'emptyTag': [], 'remove': [], 'over': [], 'error': [] };
     do {
