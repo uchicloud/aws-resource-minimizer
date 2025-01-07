@@ -2,7 +2,7 @@ import type { Handler } from "aws-lambda";
 import { categorizeResources } from './find_resource';
 import { saveS3 } from "./save_s3";
 import { messageDict } from './constants'
-import { getThisMonth, send_message } from './utility';
+import { getThisMonth, sendMessage } from './utility';
 
 export const handler: Handler = async (event, context) => {
     const { QueryString, skipNotify } = event;
@@ -58,7 +58,7 @@ ${resources.flatMap((r) => r.Properties?.map((p) =>
 
         if (message && !skipNotify) {
             try {
-                const json = await send_message(message);
+                const json = await sendMessage(message);
                 console.log('RESPONSE: \n' + JSON.stringify(json));
             } catch (e) {
                 if (e instanceof Error) {
